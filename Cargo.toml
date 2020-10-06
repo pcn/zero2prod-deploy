@@ -1,0 +1,30 @@
+[package]
+name = "zero2prod"
+version = "0.1.0"
+authors = ["Peter C. Norton <spacey-github.com@ssr.com>"]
+edition = "2018"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "app"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# Using actix 2 because that's what's on their web site.
+# but the book uses 2, but didn't really specify that up-front.
+actix-web = "2.0.0"
+actix-rt = "1.1.1"
+serde = {version="1", features=["derive"]}
+
+[dependencies.sqlx]
+version = "0.4.0-beta.1"
+default-features = false
+features = [ "runtime-tokio", "macros", "postgres", "uuid", "chrono", "migrate"]
+
+[dev-dependencies]
+reqwest = "0.10"
+tokio = "0.2.22"
