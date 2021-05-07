@@ -78,24 +78,29 @@
 //     }
 // }
 
-async fn spawn_app() -> std::io::Result<()> {
-    zero2prod::run().await 
+use std::net::TcpListener;
+
+// Launch our application in the background ~somehow~
+fn spawn_app() -> String {
+    let listener = TcpListener::bind("127.0.0.1:0")
+        .expect("Failed to bind random port");
+    // We retrieve the port assigned to us by the OS
+    let port = listener.local_addr().unwrap().port();
+    let server = zero2prod::run(listener).expect("Failed to bind address");
+    let _ = tokio::spawn(server);
+    // We resturn the application address to the caller
+    format!("127.0.0.1:{}", port)
 }
 
 #[actix_rt::test]
 async fn health_check_works() {
     // Arrange
-    spawn_app().await.expect("Failed to spawn our app.");
-    // We need to bring in `reqwest`
-    // to perform HTTP requests against our applicatoin.
-    //
-    // Use `cargo add reqwest --dev --version 0.11` to add it under
-    // `[dev-dependencies]` in Cargo.toml
+    let address = spawn_app();
     let client = reqwest::Client::new();
 
     // Act
     let response = client
-        .get("127.0.0.1:8000/health_check")
+        .get(&format!("http://{}/health_check", &address))
         .send()
         .await
         .expect("Failed to execute request");
@@ -104,9 +109,3 @@ async fn health_check_works() {
     assert!(response.status().is_success());
     assert_eq!(Some(0), response.content_length());
 }
-
-// Launch our application in the background ~somehow~
-async fn spawn_app() -> std::io::Request<()> {
-    todo!()
-}
-      
