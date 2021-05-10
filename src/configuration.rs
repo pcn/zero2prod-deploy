@@ -3,6 +3,7 @@
 // #[derive(serde::Deserialize)]
 // pub struct Settings {}
 use std::convert::{TryFrom, TryInto};
+use serde_aux::field_attributes::deserialize_number_from_string;
 
 #[derive(serde::Deserialize)]
 pub struct Settings {
@@ -14,6 +15,7 @@ pub struct Settings {
 pub struct DatabaseSettings {
     pub username: String,
     pub password: String,
+    #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: u16,
     pub host: String,
     pub database_name: String,
@@ -21,6 +23,7 @@ pub struct DatabaseSettings {
 
 #[derive(serde::Deserialize)]
 pub struct ApplicationSettings {
+    #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: u16,
     pub host: String,
 }
@@ -30,8 +33,6 @@ pub enum Environment {
     Local,
     Production,
 }
-
-
 
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     // Initialize our configuration reader
@@ -52,7 +53,7 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     // Layuer on the environment-specific values
     settings.merge(
         config::File::from(configuration_directory.join(environment.as_str())).required(true),
-        )?;
+    )?;
 
     // Add in settings from environment variables (with a prefix of APP and '__' as separator)
     // E.g. `APP_APPLICATION__PORT=5001 would set `Settings.application.port`
