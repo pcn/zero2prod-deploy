@@ -5,6 +5,7 @@
 use std::convert::{TryFrom, TryInto};
 use serde_aux::field_attributes::deserialize_number_from_string;
 use sqlx::postgres::PgConnectOptions;
+use sqlx::postgres::PgSslMode;
 
 #[derive(serde::Deserialize)]
 pub struct Settings {
@@ -76,7 +77,7 @@ impl DatabaseSettings {
         } else {
             // Try an encrypted connection, but fallback if it fails
             // XXX: does this log or otherwise alert us if it fails?
-            PgSslMode::Prefer;
+            PgSslMode::Prefer
         };
         PgConnectOptions::new()
             .host(&self.host)
