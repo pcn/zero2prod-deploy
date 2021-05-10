@@ -1,0 +1,6 @@
+target/
+deploy/
+tests/
+Dockerfilescripts/
+migrations/
+book-code/
