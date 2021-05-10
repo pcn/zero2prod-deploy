@@ -31,8 +31,6 @@ pub enum Environment {
     Production,
 }
 
-
-
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     // Initialize our configuration reader
     let mut settings = config::Config::default();
@@ -52,7 +50,7 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     // Layuer on the environment-specific values
     settings.merge(
         config::File::from(configuration_directory.join(environment.as_str())).required(true),
-        )?;
+    )?;
 
     // Add in settings from environment variables (with a prefix of APP and '__' as separator)
     // E.g. `APP_APPLICATION__PORT=5001 would set `Settings.application.port`
