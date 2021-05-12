@@ -1,10 +1,5 @@
 use unicode_segmentation::UnicodeSegmentation;
 
-pub struct NewSubscriber {
-    pub email: String,
-    pub name: SubscriberName,
-}
-
 #[derive(Debug)]
 pub struct SubscriberName(String);
 
@@ -53,7 +48,7 @@ mod tests {
     fn a_256_grapheme_long_name_is_valid() {
         let name = "a̐".repeat(256);
         assert_ok!(SubscriberName::parse(name));
-    }        
+    }
 
     #[test]
     fn a_name_longer_than_256_graphemes_is_rejected() {
