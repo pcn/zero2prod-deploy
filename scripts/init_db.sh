@@ -12,14 +12,15 @@ DB_NAME="${POSTGRES_DB:=newsletter}"
 # Check if a custom port has been set, otherwise default to '5432'
 DB_PORT="${POSTGRES_PORT:=5432}"
 
-# Launch postgres using Docker
+# Launch postgres using Docker unless we-re just trying to run a migration
+[ -z $SKIP_DB  ] && \
 docker run \
        -e POSTGRES_USER=${DB_USER} \
        -e POSTGRES_PASSWORD=${DB_PASSWORD} \
        -e POSTGRES_DB=${DB_NAME} \
        -p "${DB_PORT}":5432 \
        -d postgres \
-       postgres -N 1000 || true
+       postgres -N 1000
 # Increased maximum number of connections for testing purposes
 until psql -h "localhost" -U "${DB_USER}" -p "${DB_PORT}" -d "postgres" -c '\q'; do
     >&2 echo "Postgres is still unavailable - sleeping "
