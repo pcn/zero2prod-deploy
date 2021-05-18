@@ -13,7 +13,7 @@ DB_NAME="${POSTGRES_DB:=newsletter}"
 DB_PORT="${POSTGRES_PORT:=5432}"
 
 # Launch postgres using Docker unless we-re just trying to run a migration
-[ -z $SKIP_DB  ] && \
+[ -z $SKIP_DOCKER  ] && \
 docker run \
        -e POSTGRES_USER=${DB_USER} \
        -e POSTGRES_PASSWORD=${DB_PASSWORD} \

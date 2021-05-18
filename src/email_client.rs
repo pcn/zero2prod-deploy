@@ -52,10 +52,10 @@ impl EmailClient {
 
 #[derive(serde::Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct SendEmailRequest <'a> {
+struct SendEmailRequest<'a> {
     from: &'a str,
-    to:  &'a str,
-    subject:  &'a str,
+    to: &'a str,
+    subject: &'a str,
     html_body: &'a str,
     text_body: &'a str,
 }
@@ -64,12 +64,12 @@ struct SendEmailRequest <'a> {
 mod tests {
     use crate::domain::SubscriberEmail;
     use crate::email_client::EmailClient;
+    use claim::{assert_err, assert_ok};
     use fake::faker::internet::en::SafeEmail;
     use fake::faker::lorem::en::{Paragraph, Sentence};
     use fake::{Fake, Faker};
-    use wiremock::matchers::{any, header, header_exists, path, method};
-    use wiremock::{Mock, MockServer, ResponseTemplate, Request};
-    use claim::{assert_err, assert_ok};
+    use wiremock::matchers::{any, header, header_exists, method, path};
+    use wiremock::{Mock, MockServer, Request, ResponseTemplate};
 
     struct SendEmailBodyMatcher;
 
@@ -88,11 +88,10 @@ mod tests {
     fn email_client(base_url: String) -> EmailClient {
         EmailClient::new(base_url, email(), Faker.fake())
     }
-        
+
     impl wiremock::Match for SendEmailBodyMatcher {
         fn matches(&self, request: &Request) -> bool {
-            let result: Result<serde_json::Value, _> =
-                serde_json::from_slice(&request.body);
+            let result: Result<serde_json::Value, _> = serde_json::from_slice(&request.body);
             if let Ok(body) = result {
                 dbg!(&body);
                 // Check that all the mandatory fields are populated
@@ -166,7 +165,7 @@ mod tests {
         let email_client = EmailClient::new(mock_server.uri(), sender, Faker.fake());
 
         Mock::given(any())
-        // Not a 200 anymore
+            // Not a 200 anymore
             .respond_with(ResponseTemplate::new(500))
             .expect(1)
             .mount(&&mock_server)
@@ -180,7 +179,7 @@ mod tests {
         // Assert
         assert_err!(outcome);
     }
-    
+
     #[tokio::test]
     async fn send_email_times_out_if_the_server_takes_too_long() {
         // Arrange
@@ -189,7 +188,7 @@ mod tests {
         let email_client = EmailClient::new(mock_server.uri(), sender, Faker.fake());
 
         let response = ResponseTemplate::new(200)
-        // 3 minutes
+            // 3 minutes
             .set_delay(std::time::Duration::from_secs(180));
         Mock::given(any())
             .respond_with(response)
@@ -222,7 +221,8 @@ mod tests {
             .await;
 
         // Act
-        let _ = email_client.send_email(email(), &subject(), &content(), &content())
+        let _ = email_client
+            .send_email(email(), &subject(), &content(), &content())
             .await;
 
         // Assert
